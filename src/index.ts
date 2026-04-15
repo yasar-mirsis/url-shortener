@@ -3,6 +3,7 @@ import { createServer, Server } from 'http';
 import rateLimit from 'express-rate-limit';
 import { registerRoutes } from './routes';
 import { requestLogger } from './utils/logger';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
@@ -55,29 +56,10 @@ app.use(limiter);
 registerRoutes(app);
 
 // Error handling middleware
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction): void => {
-  console.error(`[${new Date().toISOString()}] Error:`, err.message);
-  
-  // Handle JSON parsing errors
-  if (err instanceof SyntaxError && 'body' in err) {
-    res.status(400).json({ error: 'Invalid JSON format' });
-    return;
-  }
-  
-  // Handle rate limit errors (express-rate-limit sets status code)
-  if ('statusCode' in err && err.statusCode === 429) {
-    res.status(429).json({ error: 'Too many requests, please try again later.' });
-    return;
-  }
-  
-  // Default error response
-  res.status(500).json({ error: 'Internal server error' });
-});
+app.use(errorHandler);
 
 // 404 handler for undefined routes
-app.use((_req: Request, res: Response): void => {
-  res.status(404).json({ error: 'Not found' });
-});
+app.use(notFoundHandler);
 
 // Start server
 export const start = async (port: number = PORT): Promise<Server> => {
