@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import { createServer, Server } from 'http';
 import rateLimit from 'express-rate-limit';
 import { registerRoutes } from './routes';
+import { requestLogger } from './utils/logger';
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
@@ -24,6 +25,7 @@ app.use((req: Request, res: Response, next: NextFunction): void => {
 // JSON body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger());
 
 // Request logging middleware
 app.use((req: Request, _res: Response, next: NextFunction): void => {
