@@ -1,5 +1,6 @@
 import express, { Application, Server } from 'express';
 import { registerRoutes } from './routes';
+import { requestLogger } from './utils/logger';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -7,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger());
 
 // Register routes
 registerRoutes(app);
