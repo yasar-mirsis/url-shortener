@@ -11,6 +11,7 @@ export const save = async (urlData: URLData): Promise<void> => {
     throw new Error(`Short code ${urlData.shortCode} already exists`);
   }
   urlStore.set(urlData.shortCode, urlData);
+  return Promise.resolve();
 };
 
 /**
@@ -18,7 +19,7 @@ export const save = async (urlData: URLData): Promise<void> => {
  */
 export const findById = async (code: string): Promise<URLData | null> => {
   const urlData = urlStore.get(code);
-  return urlData || null;
+  return Promise.resolve(urlData || null);
 };
 
 /**
@@ -34,20 +35,22 @@ export const findAll = async (
   const endIndex = startIndex + limit;
   const data = allUrls.slice(startIndex, endIndex);
   
-  return {
+  const result: PaginatedResult = {
     data,
     total,
     page,
     limit,
     totalPages: Math.ceil(total / limit)
   };
+  
+  return Promise.resolve(result);
 };
 
 /**
  * Delete a URL by its short code
  */
 export const deleteById = async (code: string): Promise<boolean> => {
-  return urlStore.delete(code);
+  return Promise.resolve(urlStore.delete(code));
 };
 
 /**
@@ -62,6 +65,7 @@ export const incrementClicks = async (code: string): Promise<void> => {
   urlData.clicks += 1;
   urlData.lastClickedAt = new Date().toISOString();
   urlStore.set(code, urlData);
+  return Promise.resolve();
 };
 
 // Export as default object for easier importing
